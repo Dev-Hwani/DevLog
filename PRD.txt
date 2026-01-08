@@ -1,0 +1,186 @@
+# Velog 클론 서비스 PRD
+
+## 1. 서비스 개요
+
+개발자를 위한 기술 블로그 플랫폼으로, 사용자는 글을 작성·공유하고 다른 개발자를 팔로우하며 기술 지식을 축적한다.
+
+---
+
+## 2. 핵심 목표
+
+* Markdown 기반 기술 블로그 제공
+* 개발자 중심 커뮤니티 형성
+* 검색·태그 기반 콘텐츠 탐색
+* SEO 친화적인 구조
+
+---
+
+## 3. 사용자 유형
+
+| 유형  | 설명                 |
+| --- | ------------------ |
+| 비회원 | 글 조회, 검색           |
+| 회원  | 글 작성, 댓글, 좋아요, 팔로우 |
+| 관리자 | 신고 처리, 게시글 관리      |
+
+---
+
+## 4. 기능 목록 (PRD)
+
+### 4-1. 인증 / 회원
+
+* 회원가입 / 로그인 (JWT)
+* GitHub / Google OAuth
+* 프로필 수정 (닉네임, 소개글, 프로필 이미지)
+
+### 4-2. 글(Article)
+
+* Markdown 기반 글 작성
+* 임시 저장
+* 글 공개 / 비공개
+* 태그 등록
+* 썸네일 이미지 업로드
+* 조회수 증가
+
+### 4-3. 댓글(Comment)
+
+* 댓글 작성 / 수정 / 삭제
+* 대댓글(1-depth)
+
+### 4-4. 반응
+
+* 좋아요
+* 북마크
+
+### 4-5. 팔로우
+
+* 사용자 팔로우 / 언팔로우
+* 팔로잉 글 피드
+
+### 4-6. 검색
+
+* 제목/내용 검색
+* 태그 기반 검색
+
+---
+
+# DB ERD 설계
+
+## User
+
+* id (PK)
+* email (UNIQUE)
+* password
+* nickname
+* bio
+* profile_image_url
+* created_at
+
+## Article
+
+* id (PK)
+* user_id (FK)
+* title
+* content
+* thumbnail_url
+* is_public
+* view_count
+* created_at
+* updated_at
+
+## Tag
+
+* id (PK)
+* name (UNIQUE)
+
+## ArticleTag
+
+* article_id (FK)
+* tag_id (FK)
+
+## Comment
+
+* id (PK)
+* article_id (FK)
+* user_id (FK)
+* parent_id (nullable)
+* content
+* created_at
+
+## Like
+
+* id (PK)
+* article_id (FK)
+* user_id (FK)
+
+## Bookmark
+
+* id (PK)
+* article_id (FK)
+* user_id (FK)
+
+## Follow
+
+* id (PK)
+* follower_id (FK)
+* following_id (FK)
+
+---
+
+# API 명세서
+
+## Auth
+
+* POST /api/auth/signup
+* POST /api/auth/login
+* POST /api/auth/oauth/{provider}
+
+## User
+
+* GET /api/users/{id}
+* PUT /api/users/me
+* GET /api/users/{id}/articles
+
+## Article
+
+* POST /api/articles
+* GET /api/articles
+* GET /api/articles/{id}
+* PUT /api/articles/{id}
+* DELETE /api/articles/{id}
+
+## Comment
+
+* POST /api/articles/{id}/comments
+* DELETE /api/comments/{id}
+
+## Reaction
+
+* POST /api/articles/{id}/like
+* DELETE /api/articles/{id}/like
+* POST /api/articles/{id}/bookmark
+
+## Follow
+
+* POST /api/users/{id}/follow
+* DELETE /api/users/{id}/follow
+
+---
+
+## 확장 기능
+
+* Redis 조회수 캐싱
+
+Frontend
+- Next.js (React)
+- JavaScript
+- CSS
+- Zustand
+- React Query
+- Markdown Editor (TipTap)
+
+Backend
+- Spring Boot
+- Spring Security + JWT
+- MySQL
+- Redis (조회수/세션 캐싱)

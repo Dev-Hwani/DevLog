@@ -1,0 +1,58 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/devlog_db?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:dev-placeholder}
+            client-secret: ${GITHUB_CLIENT_SECRET:dev-placeholder}
+            scope: read:user,user:email
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:dev-placeholder}
+            client-secret: ${GOOGLE_CLIENT_SECRET:dev-placeholder}
+            scope: profile,email
+        provider:
+          github:
+            user-name-attribute: id
+
+logging:
+  level:
+    com.devlog: DEBUG
+    org.springframework.security: INFO
+
+app:
+  frontend-url: http://localhost:3000
+  jwt:
+    issuer: devlog
+    secret: ${JWT_SECRET:devlog-local-secret-devlog-local-secret}
+    access-token-minutes: 15
+    refresh-token-days: 14
+    cookie:
+      access-name: devlog_access
+      refresh-name: devlog_refresh
+      same-site: Lax
+      secure: false
