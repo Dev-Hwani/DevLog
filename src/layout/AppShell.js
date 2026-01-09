@@ -27,7 +27,7 @@ const AppShell = () => {
       }
       if (event.type === 'auth-expired') {
         queryCache.setQueryData(['me'], null);
-        setNotice({ type: 'error', message: 'Session expired. Please log in again.' });
+        setNotice({ type: 'error', message: '세션이 만료되었습니다. 다시 로그인해 주세요.' });
         navigate(ROUTE_PATHS.login, { replace: true });
       }
     });

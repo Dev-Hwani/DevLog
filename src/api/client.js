@@ -19,13 +19,13 @@ api.interceptors.response.use(
     const { response, config } = error || {};
 
     if (!response) {
-      notifyError('Network error. Check your connection and try again.');
+      notifyError('네트워크 오류입니다. 연결을 확인해 주세요.');
       return Promise.reject(error);
     }
 
     if (response.status !== 401 || config?.url?.includes('/api/auth/refresh')) {
       if (response.status >= 500) {
-        notifyError('Server error. Please try again shortly.');
+        notifyError('서버 오류입니다. 잠시 후 다시 시도해 주세요.');
       }
       return Promise.reject(error);
     }
