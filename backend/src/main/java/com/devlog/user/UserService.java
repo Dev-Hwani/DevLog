@@ -47,21 +47,14 @@ public class UserService {
         );
     }
 
-    public UserProfileResponse updateProfile(UserPrincipal principal, UserUpdateRequest request) {
+    public void updateProfile(UserPrincipal principal, UserUpdateRequest request) {
         if (principal == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
         User user = getUser(principal.getId());
         user.setNickname(request.nickname());
         user.setBio(request.bio());
-        User saved = userRepository.save(user);
-        return UserProfileResponse.from(
-            saved,
-            true,
-            followRepository.countByFollowingId(saved.getId()),
-            followRepository.countByFollowerId(saved.getId()),
-            false
-        );
+        userRepository.save(user);
     }
 
     public void updateProfileImage(UserPrincipal principal, MultipartFile file) {

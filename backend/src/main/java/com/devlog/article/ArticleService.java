@@ -16,11 +16,16 @@ import com.devlog.repository.LikeRepository;
 import com.devlog.repository.UserRepository;
 import com.devlog.security.UserPrincipal;
 import com.devlog.tag.TagService;
+import com.devlog.view.ViewHistoryService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +44,7 @@ public class ArticleService {
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final TagService tagService;
+    private final ViewHistoryService viewHistoryService;
 
     @Transactional
     public ArticleResponse createArticle(UserPrincipal principal, ArticleCreateRequest request) {
@@ -51,14 +57,9 @@ public class ArticleService {
     }
 
     @Transactional
-    public ArticleResponse updateArticle(Long articleId, UserPrincipal principal, ArticleUpdateRequest request) {
+    public void updateArticle(Long articleId, UserPrincipal principal, ArticleUpdateRequest request) {
         Article article = getArticleForOwner(articleId, principal);
         applyRequest(article, request);
-        long bookmarkCount = article.getBookmarkCount();
-        boolean likedByMe = likeRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
-        boolean bookmarkedByMe =
-            bookmarkRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
-        return ArticleMapper.toResponse(article, bookmarkCount, likedByMe, bookmarkedByMe);
     }
 
     @Transactional
@@ -82,6 +83,9 @@ public class ArticleService {
         }
         articleRepository.incrementViewCount(articleId);
         article.setViewCount(article.getViewCount() + 1);
+        if (principal != null) {
+            viewHistoryService.recordView(principal.getId(), articleId);
+        }
         long bookmarkCount = article.getBookmarkCount();
         boolean likedByMe = principal != null
             && likeRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
@@ -99,7 +103,7 @@ public class ArticleService {
         int page,
         int size
     ) {
-        PageRequest pageable = PageRequest.of(page, size, resolveSort(sort));
+        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSort(sort));
         Page<Article> result;
         if (query != null && !query.isBlank()) {
             result = articleRepository.searchPublic(query.trim(), pageable);
@@ -119,7 +123,7 @@ public class ArticleService {
         int page,
         int size
     ) {
-        PageRequest pageable = PageRequest.of(page, size, resolveSort(sort));
+        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSort(sort));
         Page<Article> result;
         if (principal != null && principal.getId().equals(userId)) {
             result = articleRepository.findByAuthorIdAndIsDeletedFalse(userId, pageable);
@@ -127,6 +131,55 @@ public class ArticleService {
             result = articleRepository.findByAuthorIdAndIsDeletedFalseAndIsPublicTrue(userId, pageable);
         }
         return buildSummaryResponse(result, principal);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ArticleSummaryResponse> listLikedArticles(
+        Long userId,
+        UserPrincipal principal,
+        int page,
+        int size
+    ) {
+        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size);
+        List<Long> likedIds = likeRepository.findLikedArticleIds(userId, pageable);
+        long totalElements = likeRepository.countLikedArticles(userId);
+        List<Article> articles = mapToOrderedArticles(likedIds);
+        return buildSummaryResponse(articles, totalElements, page, size, principal);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ArticleSummaryResponse> listViewedArticles(
+        Long userId,
+        UserPrincipal principal,
+        int page,
+        int size
+    ) {
+        if (principal == null || !principal.getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        List<Long> viewedIds = viewHistoryService.listViewedArticleIds(userId, page, size);
+        Map<Long, Article> articleMap = fetchArticleMap(viewedIds);
+        List<Article> visibleArticles = new ArrayList<>();
+        List<Long> staleIds = new ArrayList<>();
+
+        for (Long id : viewedIds) {
+            Article article = articleMap.get(id);
+            if (article == null || article.isDeleted()) {
+                staleIds.add(id);
+                continue;
+            }
+            if (!article.isPublic() && !isOwner(principal, article)) {
+                staleIds.add(id);
+                continue;
+            }
+            visibleArticles.add(article);
+        }
+
+        if (!staleIds.isEmpty()) {
+            viewHistoryService.removeViews(userId, staleIds);
+        }
+        long totalElements = viewHistoryService.countViewedArticles(userId);
+        return buildSummaryResponse(visibleArticles, totalElements, page, size, principal);
     }
 
     @Transactional
@@ -216,7 +269,22 @@ public class ArticleService {
         Page<Article> result,
         UserPrincipal principal
     ) {
-        List<Article> articles = result.getContent();
+        return buildSummaryResponse(
+            result.getContent(),
+            result.getTotalElements(),
+            result.getNumber() + 1,
+            result.getSize(),
+            principal
+        );
+    }
+
+    private PageResponse<ArticleSummaryResponse> buildSummaryResponse(
+        List<Article> articles,
+        long totalElements,
+        int page,
+        int size,
+        UserPrincipal principal
+    ) {
         Long userId = principal == null ? null : principal.getId();
         Set<Long> likedIds = Collections.emptySet();
         Set<Long> bookmarkedIds = Collections.emptySet();
@@ -229,21 +297,41 @@ public class ArticleService {
             );
         }
 
+        Set<Long> finalLikedIds = likedIds;
+        Set<Long> finalBookmarkedIds = bookmarkedIds;
         List<ArticleSummaryResponse> items = articles.stream()
             .map(article -> ArticleMapper.toSummary(
                 article,
                 article.getBookmarkCount(),
-                likedIds.contains(article.getId()),
-                bookmarkedIds.contains(article.getId())
+                finalLikedIds.contains(article.getId()),
+                finalBookmarkedIds.contains(article.getId())
             ))
             .toList();
-        return new PageResponse<>(
-            items,
-            result.getNumber(),
-            result.getSize(),
-            result.getTotalElements(),
-            result.getTotalPages()
-        );
+        int totalPages = size == 0 ? 0 : (int) Math.ceil((double) totalElements / size);
+        return new PageResponse<>(items, page, size, totalElements, totalPages);
+    }
+
+    private int toZeroBasedPage(int page) {
+        return Math.max(page, 1) - 1;
+    }
+
+    private Map<Long, Article> fetchArticleMap(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return articleRepository.findByIdIn(ids).stream()
+            .collect(Collectors.toMap(Article::getId, article -> article));
+    }
+
+    private List<Article> mapToOrderedArticles(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<Long, Article> articleMap = fetchArticleMap(ids);
+        return ids.stream()
+            .map(articleMap::get)
+            .filter(article -> article != null && !article.isDeleted())
+            .toList();
     }
 
     public record ImagePayload(byte[] data, String contentType) {

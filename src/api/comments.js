@@ -12,7 +12,7 @@ export const createComment = async (articleId, payload) => {
 
 export const updateComment = async (commentId, payload) => {
   const response = await api.put(`/api/comments/${commentId}`, payload);
-  return response.data;
+  return response.data ?? null;
 };
 
 export const deleteComment = async (commentId) => {

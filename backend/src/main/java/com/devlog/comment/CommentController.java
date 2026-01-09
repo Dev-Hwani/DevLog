@@ -5,6 +5,7 @@ import com.devlog.comment.dto.CommentResponse;
 import com.devlog.comment.dto.CommentUpdateRequest;
 import com.devlog.security.UserPrincipal;
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,16 +36,18 @@ public class CommentController {
         @AuthenticationPrincipal UserPrincipal principal,
         @Valid @RequestBody CommentCreateRequest request
     ) {
-        return ResponseEntity.ok(commentService.createComment(id, principal, request));
+        CommentResponse response = commentService.createComment(id, principal, request);
+        return ResponseEntity.created(URI.create("/api/comments/" + response.id())).body(response);
     }
 
     @PutMapping("/comments/{id}")
-    public ResponseEntity<CommentResponse> update(
+    public ResponseEntity<Void> update(
         @PathVariable Long id,
         @AuthenticationPrincipal UserPrincipal principal,
         @Valid @RequestBody CommentUpdateRequest request
     ) {
-        return ResponseEntity.ok(commentService.updateComment(id, principal, request));
+        commentService.updateComment(id, principal, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/comments/{id}")

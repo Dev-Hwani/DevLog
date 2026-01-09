@@ -31,7 +31,7 @@ public class TagController {
     public ResponseEntity<PageResponse<ArticleSummaryResponse>> listArticlesByTag(
         @PathVariable String name,
         @AuthenticationPrincipal UserPrincipal principal,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(required = false) String sort
     ) {

@@ -41,7 +41,7 @@ public class FollowController {
     @GetMapping("/{id}/followers")
     public ResponseEntity<PageResponse<FollowResponse>> followers(
         @PathVariable Long id,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(followService.listFollowers(id, page, size));
@@ -50,7 +50,7 @@ public class FollowController {
     @GetMapping("/{id}/following")
     public ResponseEntity<PageResponse<FollowResponse>> following(
         @PathVariable Long id,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(followService.listFollowing(id, page, size));

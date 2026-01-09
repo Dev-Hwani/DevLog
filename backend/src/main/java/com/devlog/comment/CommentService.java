@@ -90,11 +90,10 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse updateComment(Long commentId, UserPrincipal principal, CommentUpdateRequest request) {
+    public void updateComment(Long commentId, UserPrincipal principal, CommentUpdateRequest request) {
         Comment comment = getCommentForOwner(commentId, principal);
         comment.setContent(request.content());
         comment.setDeleted(false);
-        return toResponse(comment, List.of());
     }
 
     @Transactional

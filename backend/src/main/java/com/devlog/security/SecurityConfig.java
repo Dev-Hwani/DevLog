@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
     private final OAuth2AuthenticationSuccessHandler oauth2SuccessHandler;
     private final CustomOAuth2UserService oauth2UserService;
     private final AppProperties appProperties;
@@ -40,6 +41,7 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
                 .successHandler(oauth2SuccessHandler)
             )
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

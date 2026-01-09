@@ -48,7 +48,7 @@ public class FollowService {
     }
 
     public PageResponse<FollowResponse> listFollowers(Long userId, int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Follow> result = followRepository.findByFollowingId(userId, pageable);
         Page<FollowResponse> mapped = result.map(follow ->
             new FollowResponse(UserSummary.from(follow.getFollower()), follow.getCreatedAt())
@@ -57,7 +57,7 @@ public class FollowService {
     }
 
     public PageResponse<FollowResponse> listFollowing(Long userId, int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Follow> result = followRepository.findByFollowerId(userId, pageable);
         Page<FollowResponse> mapped = result.map(follow ->
             new FollowResponse(UserSummary.from(follow.getFollowing()), follow.getCreatedAt())
@@ -79,5 +79,9 @@ public class FollowService {
     private User getUser(Long id) {
         return userRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    private int toZeroBasedPage(int page) {
+        return Math.max(page, 1) - 1;
     }
 }

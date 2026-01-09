@@ -1,10 +1,10 @@
 export const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value);
 
 export const formatDate = (value) =>
-  new Date(value).toLocaleDateString('en-US', {
+  new Date(value).toLocaleDateString('ko-KR', {
+    year: 'numeric',
     month: 'short',
     day: '2-digit',
-    year: 'numeric',
   });
 
 export const getInitials = (name) =>

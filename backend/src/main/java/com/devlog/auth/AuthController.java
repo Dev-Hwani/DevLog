@@ -9,6 +9,7 @@ import com.devlog.security.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,8 @@ public class AuthController {
     ) {
         AuthResult result = authService.signup(request);
         applyCookies(response, result.tokens());
-        return ResponseEntity.ok(result.response());
+        return ResponseEntity.created(URI.create("/api/users/" + result.response().id()))
+            .body(result.response());
     }
 
     @PostMapping("/login")

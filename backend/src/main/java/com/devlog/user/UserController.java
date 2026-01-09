@@ -43,11 +43,12 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserProfileResponse> update(
+    public ResponseEntity<Void> update(
         @AuthenticationPrincipal UserPrincipal principal,
         @Valid @RequestBody UserUpdateRequest request
     ) {
-        return ResponseEntity.ok(userService.updateProfile(principal, request));
+        userService.updateProfile(principal, request);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/me/profile-image")
@@ -72,10 +73,30 @@ public class UserController {
     public ResponseEntity<PageResponse<ArticleSummaryResponse>> userArticles(
         @PathVariable Long id,
         @AuthenticationPrincipal UserPrincipal principal,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(required = false) String sort
     ) {
         return ResponseEntity.ok(articleService.listUserArticles(id, principal, sort, page, size));
+    }
+
+    @GetMapping("/{id}/likes")
+    public ResponseEntity<PageResponse<ArticleSummaryResponse>> likedArticles(
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserPrincipal principal,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(articleService.listLikedArticles(id, principal, page, size));
+    }
+
+    @GetMapping("/{id}/views")
+    public ResponseEntity<PageResponse<ArticleSummaryResponse>> viewedArticles(
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserPrincipal principal,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(articleService.listViewedArticles(id, principal, page, size));
     }
 }

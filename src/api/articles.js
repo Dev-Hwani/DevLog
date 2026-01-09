@@ -17,7 +17,7 @@ export const createArticle = async (payload) => {
 
 export const updateArticle = async (id, payload) => {
   const response = await api.put(`/api/articles/${id}`, payload);
-  return response.data;
+  return response.data ?? null;
 };
 
 export const deleteArticle = async (id) => {

@@ -12,7 +12,7 @@ export const getMeProfile = async () => {
 
 export const updateMeProfile = async (payload) => {
   const response = await api.put('/api/users/me', payload);
-  return response.data;
+  return response.data ?? null;
 };
 
 export const updateProfileImage = async (file) => {
@@ -25,5 +25,15 @@ export const updateProfileImage = async (file) => {
 
 export const listUserArticles = async (userId, params) => {
   const response = await api.get(`/api/users/${userId}/articles`, { params });
+  return response.data;
+};
+
+export const listUserLikes = async (userId, params) => {
+  const response = await api.get(`/api/users/${userId}/likes`, { params });
+  return response.data;
+};
+
+export const listUserViews = async (userId, params) => {
+  const response = await api.get(`/api/users/${userId}/views`, { params });
   return response.data;
 };

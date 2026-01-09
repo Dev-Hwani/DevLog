@@ -9,6 +9,7 @@ import com.devlog.common.ImageValidator;
 import com.devlog.common.PageResponse;
 import com.devlog.security.UserPrincipal;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +37,14 @@ public class ArticleController {
         @AuthenticationPrincipal UserPrincipal principal,
         @Valid @RequestBody ArticleCreateRequest request
     ) {
-        return ResponseEntity.ok(articleService.createArticle(principal, request));
+        ArticleResponse response = articleService.createArticle(principal, request);
+        return ResponseEntity.created(URI.create("/api/articles/" + response.id())).body(response);
     }
 
     @GetMapping
     public ResponseEntity<PageResponse<ArticleSummaryResponse>> list(
         @AuthenticationPrincipal UserPrincipal principal,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(required = false) String sort,
         @RequestParam(required = false) String tag,
@@ -60,12 +62,13 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ArticleResponse> update(
+    public ResponseEntity<Void> update(
         @PathVariable Long id,
         @AuthenticationPrincipal UserPrincipal principal,
         @Valid @RequestBody ArticleUpdateRequest request
     ) {
-        return ResponseEntity.ok(articleService.updateArticle(id, principal, request));
+        articleService.updateArticle(id, principal, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

@@ -16,6 +16,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     @EntityGraph(attributePaths = {"author", "tags"})
     Optional<Article> findByIdAndIsDeletedFalse(Long id);
 
+    @EntityGraph(attributePaths = {"author", "tags"})
+    List<Article> findByIdIn(List<Long> ids);
+
     Page<Article> findByIsDeletedFalseAndIsPublicTrue(Pageable pageable);
 
     Page<Article> findByAuthorIdAndIsDeletedFalse(Long authorId, Pageable pageable);
