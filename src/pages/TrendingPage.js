@@ -1,15 +1,35 @@
+import { useEffect } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ArticleList from '../components/ArticleList';
 import EmptyState from '../components/EmptyState';
 import { fetchTrendingFeed } from '../api/feed';
 import { useCursorParams } from '../hooks/useCursorParams';
+import { buildSearchParams } from '../utils/queryParams';
 import { getErrorMessage } from '../utils/requests';
 
+const RANGE_OPTIONS = [
+  { value: 'all', label: '전체' },
+  { value: '7d', label: '일주일' },
+  { value: '24h', label: '24시간' },
+];
+
 const TrendingPage = () => {
-  const { cursor, size, setCursor } = useCursorParams();
+  const { cursor, size, setCursor, searchParams, setSearchParams } = useCursorParams();
+  const rawRange = searchParams.get('range');
+  const range =
+    rawRange === 'all' || rawRange === '7d' || rawRange === '24h' ? rawRange : '24h';
+
+  useEffect(() => {
+    if (rawRange !== range) {
+      setSearchParams(buildSearchParams(searchParams, { range, cursor: null, size }), {
+        replace: true,
+      });
+    }
+  }, [cursor, range, rawRange, searchParams, setSearchParams, size]);
+
   const feedQuery = useInfiniteQuery({
-    queryKey: ['feed', 'trending'],
-    queryFn: ({ pageParam }) => fetchTrendingFeed({ cursor: pageParam, size }),
+    queryKey: ['feed', 'trending', range],
+    queryFn: ({ pageParam }) => fetchTrendingFeed({ range, cursor: pageParam, size }),
     initialPageParam: cursor,
     getNextPageParam: (lastPage) => lastPage?.nextCursor || undefined,
   });
@@ -23,14 +43,25 @@ const TrendingPage = () => {
     }
   };
 
+  const handleRangeChange = (nextRange) => {
+    setSearchParams(buildSearchParams(searchParams, { range: nextRange, cursor: null, size }));
+  };
+
   return (
     <section className="home">
       <div className="feed">
         <div className="feed__header">
           <div className="tabs">
-            <button type="button" className="tab tab--active">
-              트렌딩 24h
-            </button>
+            {RANGE_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={`tab ${range === option.value ? 'tab--active' : ''}`}
+                onClick={() => handleRangeChange(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
         </div>
         {feedQuery.isLoading ? (

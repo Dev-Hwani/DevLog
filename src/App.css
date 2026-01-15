@@ -706,6 +706,24 @@
   font-size: 13px;
 }
 
+.markdown img {
+  max-width: 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+}
+
 .markdown__list {
   margin: 0;
   padding-left: 20px;

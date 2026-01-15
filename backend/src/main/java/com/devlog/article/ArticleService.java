@@ -148,6 +148,23 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
+    public PageResponse<ArticleSummaryResponse> listBookmarkedArticles(
+        Long userId,
+        UserPrincipal principal,
+        int page,
+        int size
+    ) {
+        if (principal == null || !principal.getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size);
+        List<Long> bookmarkedIds = bookmarkRepository.findBookmarkedArticleIds(userId, pageable);
+        long totalElements = bookmarkRepository.countBookmarkedArticles(userId);
+        List<Article> articles = mapToOrderedArticles(bookmarkedIds);
+        return buildSummaryResponse(articles, totalElements, page, size, principal);
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<ArticleSummaryResponse> listViewedArticles(
         Long userId,
         UserPrincipal principal,

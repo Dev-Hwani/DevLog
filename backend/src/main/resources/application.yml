@@ -49,7 +49,7 @@ app:
   jwt:
     issuer: devlog
     secret: ${JWT_SECRET:devlog-local-secret-devlog-local-secret}
-    access-token-minutes: 15
+    access-token-minutes: 1440
     refresh-token-days: 14
     cookie:
       access-name: devlog_access

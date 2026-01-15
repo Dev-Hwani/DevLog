@@ -33,6 +33,11 @@ export const listUserLikes = async (userId, params) => {
   return response.data;
 };
 
+export const listUserBookmarks = async (userId, params) => {
+  const response = await api.get(`/api/users/${userId}/bookmarks`, { params });
+  return response.data;
+};
+
 export const listUserViews = async (userId, params) => {
   const response = await api.get(`/api/users/${userId}/views`, { params });
   return response.data;

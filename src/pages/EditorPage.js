@@ -6,6 +6,7 @@ import { buildPath } from '../routes/paths';
 import { parseTagsInput } from '../utils/tags';
 import { buildImageUrl, validateImageFile } from '../utils/images';
 import { getErrorMessage } from '../utils/requests';
+import MarkdownPreview from '../components/MarkdownPreview';
 
 const EditorPage = () => {
   const { id } = useParams();
@@ -214,6 +215,7 @@ const EditorPage = () => {
             <h3>{form.title || '제목 없음'}</h3>
             <p>{form.summary || '요약이 여기에 표시돼요.'}</p>
           </div>
+          <MarkdownPreview text={form.content || ''} />
         </div>
       </form>
     </section>

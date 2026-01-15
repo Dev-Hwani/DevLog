@@ -5,6 +5,7 @@ import {
   getUserProfile,
   listUserArticles,
   listUserLikes,
+  listUserBookmarks,
   listUserViews,
   updateMeProfile,
   updateProfileImage,
@@ -26,6 +27,7 @@ import { getErrorMessage } from '../utils/requests';
 const PROFILE_TABS = [
   { value: 'posts', label: '글' },
   { value: 'likes', label: '좋아요' },
+  { value: 'bookmarks', label: '북마크', meOnly: true },
   { value: 'views', label: '내가 본 글', meOnly: true },
   { value: 'followers', label: '팔로워' },
   { value: 'following', label: '팔로잉' },
@@ -51,6 +53,7 @@ const ProfilePage = () => {
   const activeTab = availableTabs.some((tab) => tab.value === tabParam) ? tabParam : 'posts';
   const isPostsTab = activeTab === 'posts';
   const isLikesTab = activeTab === 'likes';
+  const isBookmarksTab = activeTab === 'bookmarks';
   const isViewsTab = activeTab === 'views';
   const isFollowersTab = activeTab === 'followers';
   const isFollowingTab = activeTab === 'following';
@@ -77,6 +80,12 @@ const ProfilePage = () => {
     queryKey: ['user-likes', userId, page, size],
     queryFn: () => listUserLikes(userId, { page, size }),
     enabled: Number.isFinite(userId) && isLikesTab,
+  });
+
+  const bookmarksQuery = useQuery({
+    queryKey: ['user-bookmarks', userId, page, size],
+    queryFn: () => listUserBookmarks(userId, { page, size }),
+    enabled: Number.isFinite(userId) && isBookmarksTab && isMe,
   });
 
   const viewsQuery = useQuery({
@@ -184,6 +193,8 @@ const ProfilePage = () => {
     ? articlesQuery.data?.totalPages ?? 0
     : isLikesTab
       ? likesQuery.data?.totalPages ?? 0
+      : isBookmarksTab
+        ? bookmarksQuery.data?.totalPages ?? 0
       : isViewsTab
         ? viewsQuery.data?.totalPages ?? 0
         : isFollowersTab
@@ -225,6 +236,27 @@ const ProfilePage = () => {
           items={likesQuery.data?.items || []}
           emptyTitle="좋아요한 글이 없어요"
           emptyMessage="마음에 드는 글을 좋아요 해보세요."
+        />
+      );
+    }
+
+    if (isBookmarksTab) {
+      if (bookmarksQuery.isLoading) {
+        return <div className="card">북마크 목록을 불러오는 중...</div>;
+      }
+      if (bookmarksQuery.isError) {
+        return (
+          <EmptyState
+            title="북마크 목록을 불러올 수 없어요"
+            message={getErrorMessage(bookmarksQuery.error)}
+          />
+        );
+      }
+      return (
+        <ArticleList
+          items={bookmarksQuery.data?.items || []}
+          emptyTitle="북마크한 글이 없어요"
+          emptyMessage="다시 보고 싶은 글을 북마크해보세요."
         />
       );
     }

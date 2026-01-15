@@ -29,9 +29,10 @@ public class FeedController {
     @GetMapping("/trending")
     public ResponseEntity<CursorResponse<ArticleSummaryResponse>> trendingFeed(
         @AuthenticationPrincipal UserPrincipal principal,
+        @RequestParam(defaultValue = "24h") String range,
         @RequestParam(required = false) String cursor,
         @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(feedService.trendingFeed(principal, cursor, size));
+        return ResponseEntity.ok(feedService.trendingFeed(principal, range, cursor, size));
     }
 }

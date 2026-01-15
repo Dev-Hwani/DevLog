@@ -36,7 +36,7 @@ const Topbar = ({ theme, onToggleTheme }) => {
     <header className="topbar">
       <div className="topbar__inner">
         <Link to={ROUTE_PATHS.home} className="brand">
-          <span className="brand__logo">velog</span>
+          <span className="brand__logo">DevLog</span>
           <span className="brand__tagline">개발 로그 네트워크</span>
         </Link>
         <nav className="nav">

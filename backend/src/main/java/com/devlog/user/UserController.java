@@ -66,6 +66,7 @@ public class UserController {
         String contentType = ImageValidator.resolveResponseContentType(payload.contentType());
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, contentType)
+            .header(HttpHeaders.CACHE_CONTROL, "public, max-age=300")
             .body(payload.data());
     }
 
@@ -88,6 +89,16 @@ public class UserController {
         @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(articleService.listLikedArticles(id, principal, page, size));
+    }
+
+    @GetMapping("/{id}/bookmarks")
+    public ResponseEntity<PageResponse<ArticleSummaryResponse>> bookmarkedArticles(
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserPrincipal principal,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(articleService.listBookmarkedArticles(id, principal, page, size));
     }
 
     @GetMapping("/{id}/views")

@@ -9,7 +9,7 @@
 ## Backend (Spring Boot / Java 17)
 
 ### 인증/인가
-- JWT Access(15분)/Refresh(14일) 쿠키 구조 + Refresh 토큰을 Redis에 저장(`refresh:{jti}`)
+- JWT Access(24시간)/Refresh(14일) 쿠키 구조 + Refresh 토큰을 Redis에 저장(`refresh:{jti}`)
 - OAuth2(Google/GitHub) 연동 구조 준비(환경변수 주입 방식)
 - 왜: 쿠키 기반으로 보안/UX 균형을 맞추고, Redis로 Refresh 만료/폐기를 일원화
 
@@ -27,6 +27,15 @@
 - 좋아요한 글 목록 공개 조회
 - 내가 본 글 목록 Redis ZSET 기반 기록/조회(로그인 사용자만)
 - 왜: “테이블 추가 없이” 조회 기록을 저장하길 원해서 Redis로 처리
+
+### Redis 활용
+- Refresh 토큰 저장: `refresh:{jti}` 키로 TTL 저장 → 재발급/로그아웃 시 즉시 폐기 가능
+- 조회 기록: ZSET `viewed:{userId}`에 articleId를 score(시간)로 저장 → 최근 조회 순서/페이징 처리
+- 캐시:
+  - 태그 목록: `cache:tags` (TTL 5분)
+  - 트렌딩 피드: `cache:feed:trending:{cursor|first}:{size}` (TTL 1분, 비로그인 요청만)
+  - 팔로잉 피드: `cache:feed:following:{userId}:{cursor|first}:{size}` (TTL 30초)
+- 왜: DB 부하를 줄이고 응답 속도를 안정화(정합성은 TTL 내 eventually consistent)
 
 ### 성능/정합성
 - 목록 응답에서 좋아요/북마크 상태를 배치 조회해 N+1을 줄임
@@ -82,7 +91,7 @@
 - Bucket4j: 레이트 리밋 기본 적용
 
 ## 수치 요약
-- Access 15분 / Refresh 14일
+- Access 24시간 / Refresh 14일
 - 이미지 업로드 10MB, JPG/PNG
 - 기본 페이지 사이즈 10
 - 트렌딩 기준 24h

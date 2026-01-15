@@ -36,10 +36,10 @@ const HomePage = () => {
     <section className="home">
       <div className="hero">
         <div>
-          <span className="eyebrow">Velog clone</span>
+          <span className="eyebrow">DevLog clone</span>
           <h1>개발 로그를 쌓고, 나만의 포트폴리오로 연결하세요.</h1>
           <p>
-            Velog 스타일의 공간에서 배움을 기록하세요. Markdown으로 작성하고, 동료와 공유하며
+            DevLog 스타일의 공간에서 배움을 기록하세요. Markdown으로 작성하고, 동료와 공유하며
             개발자 네트워크를 키워보세요.
           </p>
           <div className="hero__actions">

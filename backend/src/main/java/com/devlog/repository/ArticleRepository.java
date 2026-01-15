@@ -46,7 +46,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         SELECT a FROM Article a
         WHERE a.isDeleted = false
           AND a.isPublic = true
-          AND a.createdAt >= :since
+          AND (:since IS NULL OR a.createdAt >= :since)
           AND (:cursorView IS NULL
             OR a.viewCount < :cursorView
             OR (a.viewCount = :cursorView AND a.likeCount < :cursorLike)

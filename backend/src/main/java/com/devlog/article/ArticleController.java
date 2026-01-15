@@ -109,6 +109,7 @@ public class ArticleController {
         String contentType = ImageValidator.resolveResponseContentType(payload.contentType());
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, contentType)
+            .header(HttpHeaders.CACHE_CONTROL, "private, max-age=300")
             .body(payload.data());
     }
 }

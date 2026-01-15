@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders the velog brand', () => {
+test('renders the DevLog brand', () => {
   render(<App />);
-  const brandElements = screen.getAllByText(/velog/i);
+  const brandElements = screen.getAllByText(/DevLog/i);
   expect(brandElements.length).toBeGreaterThan(0);
 });
