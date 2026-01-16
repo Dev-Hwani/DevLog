@@ -103,13 +103,15 @@ public class ArticleService {
         int page,
         int size
     ) {
-        PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSort(sort));
         Page<Article> result;
         if (query != null && !query.isBlank()) {
+            PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSearchSort(sort));
             result = articleRepository.searchPublic(query.trim(), pageable);
         } else if (tag != null && !tag.isBlank()) {
+            PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSort(sort));
             result = articleRepository.findPublicByTagName(tag.trim().toLowerCase(Locale.ROOT), pageable);
         } else {
+            PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSort(sort));
             result = articleRepository.findByIsDeletedFalseAndIsPublicTrue(pageable);
         }
         return buildSummaryResponse(result, principal);
@@ -278,7 +280,20 @@ public class ArticleService {
         return switch (sort.toLowerCase(Locale.ROOT)) {
             case "views" -> Sort.by(Sort.Direction.DESC, "viewCount");
             case "likes" -> Sort.by(Sort.Direction.DESC, "likeCount");
+            case "latest" -> Sort.by(Sort.Direction.DESC, "createdAt");
             default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+    }
+
+    private Sort resolveSearchSort(String sort) {
+        if (sort == null || sort.isBlank()) {
+            return Sort.by(Sort.Direction.DESC, "created_at");
+        }
+        return switch (sort.toLowerCase(Locale.ROOT)) {
+            case "views" -> Sort.by(Sort.Direction.DESC, "view_count");
+            case "likes" -> Sort.by(Sort.Direction.DESC, "like_count");
+            case "latest" -> Sort.by(Sort.Direction.DESC, "created_at");
+            default -> Sort.by(Sort.Direction.DESC, "created_at");
         };
     }
 
