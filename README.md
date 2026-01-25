@@ -74,25 +74,38 @@
 - 빈 상태/에러/설명 메시지 한국어화(핵심 메시지 중심)
 - 왜: 사용자 이해도를 빠르게 높이기 위해
 
-## 사용 기술 스택 & 사용 이유
+## 사용 기술 스택 (Frontend / Backend)
 
 ### Frontend
-- React: SPA 구조 + 빠른 UI 구성
-- React Router: URL 기반 화면 분리/공유
-- React Query: 서버 상태 캐싱/동기화
-- Axios: 공통 API 레이어 구현
+- React 19 / React DOM: SPA 렌더링 기반
+- React Router DOM 7: 라우팅/URL 상태 관리
+- TanStack React Query 5: 서버 상태 캐싱/재시도/동기화
+- Axios: 공통 HTTP 클라이언트
+- React Markdown + remark-gfm: 마크다운 렌더링(GFM 지원)
+- React Scripts (CRA): 개발 서버/빌드/테스트 표준 구성
+- Testing Library(react/dom/user-event) + Jest DOM: UI 테스트 유틸
+- Web Vitals: 성능 지표 수집
 
 ### Backend
-- Spring Boot: 빠른 API 개발/구성 표준화
-- Spring Security: JWT/OAuth 인증 표준 구현
-- JPA + Flyway: 모델링 + 스키마 버전 관리
-- MySQL: 관계형 데이터 모델
-- Redis: Refresh 토큰/조회 기록 저장
-- Bucket4j: 레이트 리밋 기본 적용
+- Java 17 + Spring Boot 3.3.3: 애플리케이션 런타임/구성 표준
+- Spring Web: REST API
+- Spring Security: 보안 필터/인증 흐름
+- Spring Data JPA: ORM 기반 데이터 접근
+- Bean Validation: 요청 검증
+- Spring OAuth2 Client: 소셜 로그인 연동
+- Spring Data Redis: Redis 연동(세션성/캐시성 데이터)
+- JJWT: JWT 발급/검증
+- Flyway: DB 스키마 마이그레이션
+- MySQL Connector/J: RDB 연결 드라이버
+- Bucket4j: 레이트 리밋
+- Lombok: 보일러플레이트 감소
+- Spring Boot Test + Spring Security Test(JUnit 5): 테스트 구성
+- Gradle: 빌드/의존성 관리
+
 
 ## 수치 요약
 - Access 24시간 / Refresh 14일
 - 이미지 업로드 10MB, JPG/PNG
 - 기본 페이지 사이즈 10
 - 트렌딩 기준 24h
-- 레이트 리밋: Auth 30/min, API 300/min
+- 레이트 리밋: Auth 1,000/min, API 1,000/min
