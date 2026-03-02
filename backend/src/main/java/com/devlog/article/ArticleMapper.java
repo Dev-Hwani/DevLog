@@ -53,12 +53,23 @@ public class ArticleMapper {
         boolean likedByMe,
         boolean bookmarkedByMe
     ) {
+        return toResponse(article, bookmarkCount, likedByMe, bookmarkedByMe, null);
+    }
+
+    public static ArticleResponse toResponse(
+        Article article,
+        long bookmarkCount,
+        boolean likedByMe,
+        boolean bookmarkedByMe,
+        Long viewCountOverride
+    ) {
         List<String> tags = article.getTags().stream()
             .map(Tag::getName)
             .toList();
         String thumbnailUrl = article.getThumbnail() != null && article.getThumbnail().length > 0
             ? "/api/articles/" + article.getId() + "/thumbnail"
             : null;
+        long viewCount = viewCountOverride == null ? article.getViewCount() : viewCountOverride;
         return new ArticleResponse(
             article.getId(),
             article.getTitle(),
@@ -70,7 +81,7 @@ public class ArticleMapper {
             article.getLevel(),
             thumbnailUrl,
             article.isPublic(),
-            article.getViewCount(),
+            viewCount,
             article.getLikeCount(),
             bookmarkCount,
             likedByMe,

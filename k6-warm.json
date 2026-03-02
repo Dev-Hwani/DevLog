@@ -1,0 +1,202 @@
+{
+    "metrics": {
+        "http_req_blocked": {
+            "avg": 0.5471261915172714,
+            "min": 0,
+            "med": 0,
+            "max": 71.7825,
+            "p(90)": 0,
+            "p(95)": 0.805
+        },
+        "group_duration": {
+            "min": 0.506,
+            "med": 5250.4097,
+            "max": 19546.0691,
+            "p(90)": 11709.95038,
+            "p(95)": 13104.60329,
+            "avg": 5253.1760648447735
+        },
+        "data_sent": {
+            "rate": 2966.5521138454096,
+            "count": 207667
+        },
+        "http_req_sending": {
+            "avg": 0.43750935723655426,
+            "min": 0,
+            "med": 0,
+            "max": 94.6231,
+            "p(90)": 0,
+            "p(95)": 0.51081
+        },
+        "http_req_failed": {
+            "fails": 2282,
+            "passes": 5,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0.0021862702229995625
+        },
+        "status_2xx": {
+            "count": 2282,
+            "rate": 32.598688880733214
+        },
+        "status_other": {
+            "count": 5,
+            "rate": 0.07142569868697024
+        },
+        "http_req_waiting": {
+            "avg": 5249.981331482292,
+            "min": 0,
+            "med": 5249.2577,
+            "max": 19543.0433,
+            "p(90)": 11708.45402,
+            "p(95)": 13101.93761
+        },
+        "checks": {
+            "passes": 2282,
+            "fails": 5,
+            "value": 0.9978137297770004
+        },
+        "vus_max": {
+            "value": 200,
+            "min": 200,
+            "max": 200
+        },
+        "http_req_duration": {
+            "p(95)": 13102.92872,
+            "avg": 5251.2128525579255,
+            "min": 0,
+            "med": 5249.7388,
+            "max": 19543.0433,
+            "p(90)": 11708.45402,
+            "thresholds": {
+                "p(95)<500": true
+            }
+        },
+        "http_req_connecting": {
+            "p(95)": 0.5609,
+            "avg": 0.4183804984696106,
+            "min": 0,
+            "med": 0,
+            "max": 71.7825,
+            "p(90)": 0
+        },
+        "data_received": {
+            "count": 11172901,
+            "rate": 159606.4520570697
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_reqs": {
+            "count": 2287,
+            "rate": 32.670114579420186
+        },
+        "vus": {
+            "min": 1,
+            "max": 200,
+            "value": 1
+        },
+        "http_req_receiving": {
+            "avg": 0.794011718408395,
+            "min": 0,
+            "med": 0.4292,
+            "max": 64.7693,
+            "p(90)": 1.0230200000000003,
+            "p(95)": 1.878439999999999
+        },
+        "iteration_duration": {
+            "avg": 21168.183389354268,
+            "min": 1046.265,
+            "med": 23203.5481,
+            "max": 39628.1014,
+            "p(90)": 27064.461199999998,
+            "p(95)": 29208.78888
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 19543.0433,
+            "p(90)": 11710.15417,
+            "p(95)": 13103.257619999998,
+            "avg": 5262.718577475888,
+            "min": 0.5059,
+            "med": 5276.08615
+        },
+        "iterations": {
+            "rate": 8.18538506952679,
+            "count": 573
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "articles list": {
+                "groups": {},
+                "checks": {
+                        "list 200": {
+                            "passes": 568,
+                            "fails": 5,
+                            "name": "list 200",
+                            "path": "::articles list::list 200",
+                            "id": "14fd4be50eb42fffcf697f49346acfb7"
+                        }
+                    },
+                "name": "articles list",
+                "path": "::articles list",
+                "id": "494a57de9853146416f36adb35dd4725"
+            },
+            "feed trending": {
+                "name": "feed trending",
+                "path": "::feed trending",
+                "id": "45cccd679088443681414d7e7c0849e5",
+                "groups": {},
+                "checks": {
+                        "trending 200": {
+                            "id": "d5277d70a8c7292b5abf4c951a6a7d59",
+                            "passes": 573,
+                            "fails": 0,
+                            "name": "trending 200",
+                            "path": "::feed trending::trending 200"
+                        }
+                    }
+            },
+            "article detail": {
+                "name": "article detail",
+                "path": "::article detail",
+                "id": "4bfbbe8c6fc6583226fec9d22f85bb27",
+                "groups": {},
+                "checks": {
+                        "detail 200": {
+                            "fails": 0,
+                            "name": "detail 200",
+                            "path": "::article detail::detail 200",
+                            "id": "d36a78ea710f3440aad66f493c5edab1",
+                            "passes": 568
+                        }
+                    }
+            },
+            "tags": {
+                "id": "da69218800709f1311087547ec2d618e",
+                "groups": {},
+                "checks": {
+                        "tags 200": {
+                            "fails": 0,
+                            "name": "tags 200",
+                            "path": "::tags::tags 200",
+                            "id": "1d55c110590d9322b5be9a9c9c901e43",
+                            "passes": 573
+                        }
+                    },
+                "name": "tags",
+                "path": "::tags"
+            }
+        },
+        "checks": {}
+    }
+}

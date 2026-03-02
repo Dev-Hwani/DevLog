@@ -1,0 +1,155 @@
+{
+    "metrics": {
+        "http_req_waiting": {
+            "min": 0,
+            "med": 2.3241,
+            "max": 21.6444,
+            "p(90)": 4.973129999999996,
+            "p(95)": 6.698365,
+            "avg": 2.8785138050570946
+        },
+        "vus_max": {
+            "value": 50,
+            "min": 50,
+            "max": 50
+        },
+        "http_req_duration": {
+            "avg": 3.1214886827079913,
+            "min": 0,
+            "med": 2.5352,
+            "max": 22.153,
+            "p(90)": 5.342299999999999,
+            "p(95)": 7.190659999999991
+        },
+        "http_req_receiving": {
+            "max": 10.9721,
+            "p(90)": 0.73167,
+            "p(95)": 1.0063,
+            "avg": 0.18950915579119096,
+            "min": 0,
+            "med": 0
+        },
+        "vus": {
+            "value": 50,
+            "min": 50,
+            "max": 50
+        },
+        "http_reqs": {
+            "count": 4904,
+            "rate": 242.78049330421894
+        },
+        "http_req_tls_handshaking": {
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 22.153,
+            "p(90)": 5.342299999999999,
+            "p(95)": 7.190659999999991,
+            "avg": 3.1214886827079913,
+            "min": 0,
+            "med": 2.5352
+        },
+        "http_req_connecting": {
+            "max": 12.8981,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.03515016313213704,
+            "min": 0,
+            "med": 0
+        },
+        "duration_trending": {
+            "avg": 3.1214886827079913,
+            "min": 0,
+            "med": 2.5352,
+            "max": 22.153,
+            "p(90)": 5.342299999999999,
+            "p(95)": 7.190659999999991
+        },
+        "iterations": {
+            "count": 4904,
+            "rate": 242.78049330421894
+        },
+        "status_2xx": {
+            "count": 4904,
+            "rate": 242.78049330421894
+        },
+        "checks": {
+            "passes": 4904,
+            "fails": 0,
+            "value": 1
+        },
+        "iteration_duration": {
+            "avg": 204.43274168026124,
+            "min": 200.0772,
+            "med": 203.48015,
+            "max": 229.3779,
+            "p(90)": 207.6868,
+            "p(95)": 209.767465
+        },
+        "http_req_failed": {
+            "fails": 4904,
+            "passes": 0,
+            "value": 0
+        },
+        "group_duration": {
+            "avg": 3.4724648450244793,
+            "min": 0,
+            "med": 2.7254,
+            "max": 22.6683,
+            "p(90)": 5.8104,
+            "p(95)": 8.01487
+        },
+        "data_received": {
+            "count": 2079296,
+            "rate": 102938.92916098883
+        },
+        "http_req_blocked": {
+            "p(95)": 0,
+            "avg": 0.09606023654159868,
+            "min": 0,
+            "med": 0,
+            "max": 17.9064,
+            "p(90)": 0
+        },
+        "data_sent": {
+            "count": 514920,
+            "rate": 25491.951796942987
+        },
+        "http_req_sending": {
+            "max": 12.5999,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.05346572185970636,
+            "min": 0,
+            "med": 0
+        }
+    },
+    "root_group": {
+        "checks": {},
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+                "feed trending": {
+                    "groups": {},
+                    "checks": {
+                            "trending 200": {
+                                "name": "trending 200",
+                                "path": "::feed trending::trending 200",
+                                "id": "d5277d70a8c7292b5abf4c951a6a7d59",
+                                "passes": 4904,
+                                "fails": 0
+                            }
+                        },
+                    "name": "feed trending",
+                    "path": "::feed trending",
+                    "id": "45cccd679088443681414d7e7c0849e5"
+                }
+            }
+    }
+}

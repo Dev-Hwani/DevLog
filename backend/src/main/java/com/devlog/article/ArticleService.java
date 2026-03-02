@@ -82,7 +82,7 @@ public class ArticleService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found");
         }
         articleRepository.incrementViewCount(articleId);
-        article.setViewCount(article.getViewCount() + 1);
+        long updatedViewCount = article.getViewCount() + 1;
         if (principal != null) {
             viewHistoryService.recordView(principal.getId(), articleId);
         }
@@ -91,7 +91,13 @@ public class ArticleService {
             && likeRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
         boolean bookmarkedByMe = principal != null
             && bookmarkRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
-        return ArticleMapper.toResponse(article, bookmarkCount, likedByMe, bookmarkedByMe);
+        return ArticleMapper.toResponse(
+            article,
+            bookmarkCount,
+            likedByMe,
+            bookmarkedByMe,
+            updatedViewCount
+        );
     }
 
     @Transactional(readOnly = true)
