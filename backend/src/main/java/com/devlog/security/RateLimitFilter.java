@@ -24,7 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
-    private static final boolean RATE_LIMIT_ENABLED = false;
+    private static final boolean RATE_LIMIT_ENABLED = true;
     private static final int AUTH_LIMIT = 1000;
     private static final int GENERAL_LIMIT = 1000;
     private static final Duration WINDOW = Duration.ofMinutes(1);
