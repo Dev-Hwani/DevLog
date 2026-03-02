@@ -1,6 +1,7 @@
 package com.devlog.view;
 
 import java.time.Instant;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ViewHistoryService {
     private static final String KEY_PREFIX = "viewed:";
+    private static final String VIEW_THROTTLE_PREFIX = "view:throttle:";
+    private static final Duration VIEW_THROTTLE_TTL = Duration.ofSeconds(2);
     private final StringRedisTemplate redisTemplate;
 
     public void recordView(Long userId, Long articleId) {
@@ -50,6 +53,21 @@ public class ViewHistoryService {
         }
         Object[] members = articleIds.stream().map(String::valueOf).toArray();
         redisTemplate.opsForZSet().remove(key(userId), members);
+    }
+
+    public boolean shouldIncrementArticleView(Long articleId, Long userId) {
+        if (articleId == null) {
+            return false;
+        }
+        String scope = userId == null ? "anon" : "user:" + userId;
+        String key = VIEW_THROTTLE_PREFIX + scope + ":" + articleId;
+        try {
+            Boolean created = redisTemplate.opsForValue().setIfAbsent(key, "1", VIEW_THROTTLE_TTL);
+            return Boolean.TRUE.equals(created);
+        } catch (RuntimeException ex) {
+            // If Redis is unavailable, fallback to counting the view.
+            return true;
+        }
     }
 
     private String key(Long userId) {

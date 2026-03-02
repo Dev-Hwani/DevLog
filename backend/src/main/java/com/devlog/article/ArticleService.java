@@ -5,6 +5,7 @@ import com.devlog.article.dto.ArticleResponse;
 import com.devlog.article.dto.ArticleSummaryResponse;
 import com.devlog.article.dto.ArticleUpdateRequest;
 import com.devlog.article.dto.ArticleVisibilityRequest;
+import com.devlog.cache.CacheService;
 import com.devlog.common.ImageValidator;
 import com.devlog.common.PageResponse;
 import com.devlog.domain.Article;
@@ -17,6 +18,7 @@ import com.devlog.repository.UserRepository;
 import com.devlog.security.UserPrincipal;
 import com.devlog.tag.TagService;
 import com.devlog.view.ViewHistoryService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.time.Duration;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,12 +42,19 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
+    private static final Duration ARTICLE_DETAIL_CACHE_TTL = Duration.ofSeconds(10);
+    private static final Duration ARTICLE_LIST_CACHE_TTL = Duration.ofSeconds(20);
+    private static final String ARTICLE_DETAIL_CACHE_PREFIX = "cache:article:detail:";
+    private static final String ARTICLE_LIST_CACHE_PREFIX = "cache:articles:list:";
+    private static final String ARTICLE_LIST_CACHE_VERSION_KEY = "cache:articles:list:version";
+
     private final ArticleRepository articleRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final TagService tagService;
     private final ViewHistoryService viewHistoryService;
+    private final CacheService cacheService;
 
     @Transactional
     public ArticleResponse createArticle(UserPrincipal principal, ArticleCreateRequest request) {
@@ -53,6 +63,7 @@ public class ArticleService {
         article.setAuthor(author);
         applyRequest(article, request);
         Article saved = articleRepository.save(article);
+        bumpArticleListCacheVersion();
         return ArticleMapper.toResponse(saved, 0, false, false);
     }
 
@@ -60,29 +71,46 @@ public class ArticleService {
     public void updateArticle(Long articleId, UserPrincipal principal, ArticleUpdateRequest request) {
         Article article = getArticleForOwner(articleId, principal);
         applyRequest(article, request);
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
     }
 
     @Transactional
     public void deleteArticle(Long articleId, UserPrincipal principal) {
         Article article = getArticleForOwner(articleId, principal);
         article.setDeleted(true);
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
     }
 
     @Transactional
     public void updateVisibility(Long articleId, UserPrincipal principal, ArticleVisibilityRequest request) {
         Article article = getArticleForOwner(articleId, principal);
         article.setPublic(request.isPublic());
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
     }
 
     @Transactional
     public ArticleResponse getArticleDetail(Long articleId, UserPrincipal principal) {
+        if (principal == null) {
+            ArticleResponse cached = cacheService.read(articleDetailCacheKey(articleId), ArticleResponse.class);
+            if (cached != null) {
+                maybeIncrementViewCount(articleId, null);
+                return cached;
+            }
+        }
+
         Article article = articleRepository.findByIdAndIsDeletedFalse(articleId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));
         if (!article.isPublic() && !isOwner(principal, article)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found");
         }
-        articleRepository.incrementViewCount(articleId);
-        long updatedViewCount = article.getViewCount() + 1;
+        Long viewerId = principal == null ? null : principal.getId();
+        long updatedViewCount = article.getViewCount();
+        if (maybeIncrementViewCount(articleId, viewerId)) {
+            updatedViewCount += 1;
+        }
         if (principal != null) {
             viewHistoryService.recordView(principal.getId(), articleId);
         }
@@ -91,13 +119,17 @@ public class ArticleService {
             && likeRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
         boolean bookmarkedByMe = principal != null
             && bookmarkRepository.existsByArticleIdAndUserId(article.getId(), principal.getId());
-        return ArticleMapper.toResponse(
+        ArticleResponse response = ArticleMapper.toResponse(
             article,
             bookmarkCount,
             likedByMe,
             bookmarkedByMe,
             updatedViewCount
         );
+        if (principal == null) {
+            cacheService.write(articleDetailCacheKey(articleId), response, ARTICLE_DETAIL_CACHE_TTL);
+        }
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -109,6 +141,18 @@ public class ArticleService {
         int page,
         int size
     ) {
+        String cacheKey = null;
+        if (principal == null) {
+            cacheKey = articleListCacheKey(tag, query, sort, page, size);
+            PageResponse<ArticleSummaryResponse> cached = cacheService.read(
+                cacheKey,
+                new TypeReference<PageResponse<ArticleSummaryResponse>>() {}
+            );
+            if (cached != null) {
+                return cached;
+            }
+        }
+
         Page<Article> result;
         if (query != null && !query.isBlank()) {
             PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSearchSort(sort));
@@ -120,7 +164,11 @@ public class ArticleService {
             PageRequest pageable = PageRequest.of(toZeroBasedPage(page), size, resolveSort(sort));
             result = articleRepository.findByIsDeletedFalseAndIsPublicTrue(pageable);
         }
-        return buildSummaryResponse(result, principal);
+        PageResponse<ArticleSummaryResponse> response = buildSummaryResponse(result, principal);
+        if (cacheKey != null) {
+            cacheService.write(cacheKey, response, ARTICLE_LIST_CACHE_TTL);
+        }
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -217,6 +265,8 @@ public class ArticleService {
         } catch (IOException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to read image file");
         }
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
     }
 
     public ImagePayload getThumbnail(Long articleId, UserPrincipal principal) {
@@ -370,6 +420,47 @@ public class ArticleService {
             .map(articleMap::get)
             .filter(article -> article != null && !article.isDeleted())
             .toList();
+    }
+
+    private boolean maybeIncrementViewCount(Long articleId, Long userId) {
+        if (!viewHistoryService.shouldIncrementArticleView(articleId, userId)) {
+            return false;
+        }
+        articleRepository.incrementViewCount(articleId);
+        return true;
+    }
+
+    private String articleDetailCacheKey(Long articleId) {
+        return ARTICLE_DETAIL_CACHE_PREFIX + articleId;
+    }
+
+    private void invalidateArticleDetailCache(Long articleId) {
+        cacheService.delete(articleDetailCacheKey(articleId));
+    }
+
+    private String articleListCacheKey(String tag, String query, String sort, int page, int size) {
+        String version = cacheService.readString(ARTICLE_LIST_CACHE_VERSION_KEY);
+        if (version == null || version.isBlank()) {
+            version = "0";
+        }
+        return ARTICLE_LIST_CACHE_PREFIX
+            + version
+            + ":t=" + normalizeCachePart(tag)
+            + ":q=" + normalizeCachePart(query)
+            + ":s=" + normalizeCachePart(sort)
+            + ":p=" + page
+            + ":z=" + size;
+    }
+
+    private String normalizeCachePart(String value) {
+        if (value == null || value.isBlank()) {
+            return "-";
+        }
+        return value.trim().toLowerCase(Locale.ROOT).replace(":", "%3A");
+    }
+
+    private void bumpArticleListCacheVersion() {
+        cacheService.increment(ARTICLE_LIST_CACHE_VERSION_KEY);
     }
 
     public record ImagePayload(byte[] data, String contentType) {

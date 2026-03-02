@@ -1,5 +1,6 @@
 package com.devlog.reaction;
 
+import com.devlog.cache.CacheService;
 import com.devlog.domain.Article;
 import com.devlog.domain.Bookmark;
 import com.devlog.domain.Like;
@@ -20,10 +21,14 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class ReactionService {
+    private static final String ARTICLE_DETAIL_CACHE_PREFIX = "cache:article:detail:";
+    private static final String ARTICLE_LIST_CACHE_VERSION_KEY = "cache:articles:list:version";
+
     private final ArticleRepository articleRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
+    private final CacheService cacheService;
 
     @Transactional
     public ReactionResponse likeArticle(Long articleId, UserPrincipal principal) {
@@ -38,6 +43,8 @@ public class ReactionService {
             articleRepository.incrementLikeCount(articleId);
             article.setLikeCount(article.getLikeCount() + 1);
         }
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
         return new ReactionResponse(article.getLikeCount(), article.getBookmarkCount());
     }
 
@@ -50,6 +57,8 @@ public class ReactionService {
             articleRepository.decrementLikeCount(articleId);
             article.setLikeCount(Math.max(0, article.getLikeCount() - 1));
         });
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
         return new ReactionResponse(article.getLikeCount(), article.getBookmarkCount());
     }
 
@@ -66,6 +75,8 @@ public class ReactionService {
             articleRepository.incrementBookmarkCount(articleId);
             article.setBookmarkCount(article.getBookmarkCount() + 1);
         }
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
         long likeCount = article.getLikeCount();
         return new ReactionResponse(likeCount, article.getBookmarkCount());
     }
@@ -79,8 +90,18 @@ public class ReactionService {
             articleRepository.decrementBookmarkCount(articleId);
             article.setBookmarkCount(Math.max(0, article.getBookmarkCount() - 1));
         });
+        invalidateArticleDetailCache(articleId);
+        bumpArticleListCacheVersion();
         long likeCount = article.getLikeCount();
         return new ReactionResponse(likeCount, article.getBookmarkCount());
+    }
+
+    private void invalidateArticleDetailCache(Long articleId) {
+        cacheService.delete(ARTICLE_DETAIL_CACHE_PREFIX + articleId);
+    }
+
+    private void bumpArticleListCacheVersion() {
+        cacheService.increment(ARTICLE_LIST_CACHE_VERSION_KEY);
     }
 
     private Article getAccessibleArticle(Long articleId, User user) {

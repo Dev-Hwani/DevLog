@@ -53,4 +53,21 @@ public class CacheService {
             // Ignore cache write failures.
         }
     }
+
+    public String readString(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public long increment(String key) {
+        try {
+            Long value = redisTemplate.opsForValue().increment(key);
+            return value == null ? 0 : value;
+        } catch (RuntimeException ex) {
+            return 0;
+        }
+    }
+
+    public void delete(String key) {
+        redisTemplate.delete(key);
+    }
 }
