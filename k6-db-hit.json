@@ -1,0 +1,155 @@
+{
+    "metrics": {
+        "http_req_duration": {
+            "p(95)": 5.765709999999998,
+            "avg": 4.236865986394558,
+            "min": 2.0709,
+            "med": 3.5797,
+            "max": 47.4353,
+            "p(90)": 5.389749999999999
+        },
+        "http_req_blocked": {
+            "med": 0,
+            "max": 7.4007,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.07845680272108843,
+            "min": 0
+        },
+        "checks": {
+            "passes": 294,
+            "fails": 0,
+            "value": 1
+        },
+        "http_req_connecting": {
+            "avg": 0.00538469387755102,
+            "min": 0,
+            "med": 0,
+            "max": 0.5277,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "duration_articles_list": {
+            "p(95)": 5.765709999999998,
+            "avg": 4.236865986394558,
+            "min": 2.0709,
+            "med": 3.5797,
+            "max": 47.4353,
+            "p(90)": 5.389749999999999
+        },
+        "http_reqs": {
+            "count": 294,
+            "rate": 14.632895807923711
+        },
+        "http_req_duration{expected_response:true}": {
+            "p(95)": 5.765709999999998,
+            "avg": 4.236865986394558,
+            "min": 2.0709,
+            "med": 3.5797,
+            "max": 47.4353,
+            "p(90)": 5.389749999999999
+        },
+        "http_req_waiting": {
+            "avg": 3.848994897959185,
+            "min": 1.5143,
+            "med": 3.0797,
+            "max": 47.4353,
+            "p(90)": 4.91797,
+            "p(95)": 5.597494999999993
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 294,
+            "value": 0
+        },
+        "iterations": {
+            "count": 294,
+            "rate": 14.632895807923711
+        },
+        "data_sent": {
+            "count": 28518,
+            "rate": 1419.3908933686
+        },
+        "vus_max": {
+            "value": 3,
+            "min": 3,
+            "max": 3
+        },
+        "status_2xx": {
+            "count": 294,
+            "rate": 14.632895807923711
+        },
+        "data_received": {
+            "count": 615636,
+            "rate": 30641.28382179225
+        },
+        "iteration_duration": {
+            "med": 204.2886,
+            "max": 247.9541,
+            "p(90)": 206.28797,
+            "p(95)": 206.5086,
+            "avg": 204.99575136054438,
+            "min": 202.6094
+        },
+        "group_duration": {
+            "avg": 4.5111105442176855,
+            "min": 2.2805,
+            "med": 3.73325,
+            "max": 47.4369,
+            "p(90)": 5.6794,
+            "p(95)": 6.212614999999993
+        },
+        "vus": {
+            "value": 3,
+            "min": 3,
+            "max": 3
+        },
+        "http_req_sending": {
+            "max": 0.5075,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.001726190476190476,
+            "min": 0,
+            "med": 0
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_receiving": {
+            "min": 0,
+            "med": 0.356,
+            "max": 5.6323,
+            "p(90)": 0.9531,
+            "p(95)": 1.00002,
+            "avg": 0.386144897959184
+        }
+    },
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "articles list": {
+                "groups": {},
+                "checks": {
+                        "list 200": {
+                            "name": "list 200",
+                            "path": "::articles list::list 200",
+                            "id": "14fd4be50eb42fffcf697f49346acfb7",
+                            "passes": 294,
+                            "fails": 0
+                        }
+                    },
+                "name": "articles list",
+                "path": "::articles list",
+                "id": "494a57de9853146416f36adb35dd4725"
+            }
+        },
+        "checks": {},
+        "name": ""
+    }
+}

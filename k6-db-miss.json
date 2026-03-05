@@ -1,0 +1,155 @@
+{
+    "metrics": {
+        "http_req_sending": {
+            "avg": 0.015937457044673538,
+            "min": 0,
+            "med": 0,
+            "max": 1.0463,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "status_2xx": {
+            "count": 291,
+            "rate": 14.44781773681727
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 291,
+            "value": 0
+        },
+        "duration_articles_list": {
+            "p(95)": 11.68265,
+            "avg": 6.7215037800687245,
+            "min": 2.5097,
+            "med": 5.0383,
+            "max": 42.5721,
+            "p(90)": 10.8605
+        },
+        "iteration_duration": {
+            "p(90)": 211.5142,
+            "p(95)": 212.551,
+            "avg": 207.38782474226804,
+            "min": 203.1398,
+            "med": 205.6904,
+            "max": 243.3559
+        },
+        "checks": {
+            "passes": 291,
+            "fails": 0,
+            "value": 1
+        },
+        "http_req_waiting": {
+            "p(90)": 10.3963,
+            "p(95)": 11.20445,
+            "avg": 6.289446735395182,
+            "min": 1.7504,
+            "med": 4.6346,
+            "max": 41.6836
+        },
+        "http_req_duration": {
+            "avg": 6.7215037800687245,
+            "min": 2.5097,
+            "med": 5.0383,
+            "max": 42.5721,
+            "p(90)": 10.8605,
+            "p(95)": 11.68265
+        },
+        "http_req_blocked": {
+            "avg": 0.08953676975945019,
+            "min": 0,
+            "med": 0,
+            "max": 8.7733,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "vus_max": {
+            "value": 3,
+            "min": 3,
+            "max": 3
+        },
+        "http_reqs": {
+            "count": 291,
+            "rate": 14.44781773681727
+        },
+        "data_received": {
+            "count": 138859,
+            "rate": 6894.190801088349
+        },
+        "vus": {
+            "value": 3,
+            "min": 3,
+            "max": 3
+        },
+        "group_duration": {
+            "p(90)": 10.9331,
+            "p(95)": 12.1006,
+            "avg": 6.919495876288659,
+            "min": 2.5982,
+            "med": 5.1586,
+            "max": 43.0808
+        },
+        "http_req_connecting": {
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.0055,
+            "min": 0,
+            "med": 0,
+            "max": 0.5335
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_receiving": {
+            "avg": 0.41611958762886586,
+            "min": 0,
+            "med": 0.4608,
+            "max": 1.5211,
+            "p(90)": 0.8995,
+            "p(95)": 0.96695
+        },
+        "data_sent": {
+            "count": 28488,
+            "rate": 1414.3966724620288
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 6.7215037800687245,
+            "min": 2.5097,
+            "med": 5.0383,
+            "max": 42.5721,
+            "p(90)": 10.8605,
+            "p(95)": 11.68265
+        },
+        "iterations": {
+            "count": 291,
+            "rate": 14.44781773681727
+        }
+    },
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "articles list": {
+                "name": "articles list",
+                "path": "::articles list",
+                "id": "494a57de9853146416f36adb35dd4725",
+                "groups": {},
+                "checks": {
+                        "list 200": {
+                            "name": "list 200",
+                            "path": "::articles list::list 200",
+                            "id": "14fd4be50eb42fffcf697f49346acfb7",
+                            "passes": 291,
+                            "fails": 0
+                        }
+                    }
+            }
+        },
+        "checks": {},
+        "name": ""
+    }
+}

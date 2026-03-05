@@ -6,6 +6,8 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
 const PAGE_SIZE = __ENV.PAGE_SIZE ? parseInt(__ENV.PAGE_SIZE, 10) : 10;
 const SLEEP_SEC = __ENV.SLEEP ? parseFloat(__ENV.SLEEP) : 1;
 const TARGET = (__ENV.TARGET || 'mixed').toLowerCase();
+const RANDOM_PAGE = (__ENV.RANDOM_PAGE || 'false').toLowerCase() === 'true';
+const MAX_PAGE = __ENV.MAX_PAGE ? parseInt(__ENV.MAX_PAGE, 10) : 100;
 const status2xx = new Counter('status_2xx');
 const status3xx = new Counter('status_3xx');
 const status4xx = new Counter('status_4xx');
@@ -76,10 +78,13 @@ function shouldRunTags() {
 
 export default function () {
   let articleId = null;
+  const listPage = RANDOM_PAGE
+    ? Math.floor(Math.random() * Math.max(MAX_PAGE, 1)) + 1
+    : 1;
 
   if (shouldRunArticles() || shouldRunDetail()) {
     group('articles list', () => {
-      const res = http.get(`${BASE_URL}/api/articles?page=1&size=${PAGE_SIZE}`);
+      const res = http.get(`${BASE_URL}/api/articles?page=${listPage}&size=${PAGE_SIZE}`);
       recordStatus(res);
       articlesDuration.add(res.timings.duration);
       check(res, { 'list 200': (r) => r.status === 200 });
