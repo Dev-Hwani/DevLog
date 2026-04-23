@@ -6,6 +6,16 @@
 - 형태: 웹 서비스 플랫폼 (프론트 + 백엔드 모노레포)
 - 배포: 미배포 (로컬 안정화 후 배포 예정)
 
+## 로컬 환경 변수
+
+- `backend/.env.example`를 기준으로 `backend/.env`를 만들어 사용합니다.
+- 필수 값:
+  - `DB_USERNAME`
+  - `DB_PASSWORD`
+  - `JWT_SECRET` (최소 32자)
+- 선택 값:
+  - `DB_URL` (미설정 시 로컬 기본값 사용)
+
 ## Backend (Spring Boot / Java 17)
 
 ### 인증/인가
